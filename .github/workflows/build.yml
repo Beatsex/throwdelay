@@ -44,6 +44,15 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Check version
+        run: |
+          CMAKE_VERSION=$(sed -n 's/^project(ThrowDelay VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
+          ISS_VERSION=$(sed -n 's/^#define AppVersion "\(.*\)"/\1/p' installer/ThrowDelay.iss)
+          if [ -z "$CMAKE_VERSION" ] || [ "$CMAKE_VERSION" != "$ISS_VERSION" ]; then
+            echo "CMakeLists.txt says '$CMAKE_VERSION', ThrowDelay.iss says '$ISS_VERSION'"
+            exit 1
+          fi
+
       - name: Configure
         run: |
           if [ "$RUNNER_OS" = "macOS" ]; then
