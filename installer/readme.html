@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Throw Delay</title>
+<style>
+  :root { --ink:#111; --ivory:#F2F1ED; --accent:#F2B8C6; --rule:1.5px solid var(--ink); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--accent); color:var(--ink);
+         font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif; line-height:1.55; }
+  .sheet { max-width:720px; margin:0 auto; min-height:100vh; border-left:var(--rule); border-right:var(--rule);
+           background:rgba(242,241,237,.55); }
+  header { border-bottom:var(--rule); padding:20px 28px; display:flex; justify-content:space-between;
+           align-items:baseline; gap:16px; flex-wrap:wrap; }
+  h1 { margin:0; font-size:19px; font-weight:700; letter-spacing:.28em; }
+  .brand, .mono { font-family:"JetBrains Mono",ui-monospace,Consolas,monospace; font-size:11px;
+                  letter-spacing:.1em; text-transform:uppercase; }
+  section { border-bottom:var(--rule); padding:22px 28px; }
+  section:last-of-type { border-bottom:0; }
+  h2 { margin:0 0 10px; font-size:13px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; }
+  p { margin:0 0 10px; font-size:15px; }
+  p:last-child, ul:last-child, dl:last-child { margin-bottom:0; }
+  ul { margin:0 0 10px; padding-left:18px; font-size:15px; }
+  li { margin-bottom:4px; }
+  dl { margin:0; display:grid; grid-template-columns:132px minmax(0,1fr); gap:6px 14px; font-size:15px; }
+  dt { font-family:"JetBrains Mono",ui-monospace,Consolas,monospace; font-size:11px; letter-spacing:.08em;
+       text-transform:uppercase; padding-top:3px; }
+  dd { margin:0; }
+  code { font-family:"JetBrains Mono",ui-monospace,Consolas,monospace; font-size:13px;
+         background:var(--ivory); border:1px solid var(--ink); padding:1px 5px; }
+  .note { background:var(--ivory); border:var(--rule); padding:12px 14px; font-size:14px; }
+  footer { padding:18px 28px; }
+  @media (max-width:560px) { dl { grid-template-columns:1fr; gap:2px 0; } dd { margin-bottom:8px; } }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<header>
+  <h1>THROW DELAY</h1>
+  <span class="brand">beatsexuell</span>
+</header>
+
+<section>
+  <h2>Was es macht</h2>
+  <p>Throw Delay ist ein Delay für Gesang, das sich selbst auslöst. Ein Look-ahead hört dem Signal
+     voraus und erkennt, wo eine Phrase endet. Nur dort öffnet der Delay-Eingang — der Hall-Wurf
+     sitzt also auf dem letzten Wort, statt die ganze Zeile zuzukleistern.</p>
+  <p>Was man sonst von Hand automatisiert, passiert damit von allein.</p>
+</section>
+
+<section>
+  <h2>Die Regler</h2>
+  <dl>
+    <dt>Time / Sync</dt><dd>Delay-Zeit, frei in Millisekunden oder als Notenwert zum Songtempo.</dd>
+    <dt>Feedback</dt><dd>Wie oft sich der Wurf wiederholt.</dd>
+    <dt>Mix</dt><dd>Anteil des Delays am Ausgang.</dd>
+    <dt>Look-ahead</dt><dd>Vorlauf: 0,5 s, 1 s oder 2 s. Mehr Vorlauf erkennt sauberer, kostet aber Latenz.</dd>
+    <dt>Live</dt><dd>Latenzfreier Modus fürs Spielen — erkennt gröber, verzögert nichts.</dd>
+    <dt>Sensitivity</dt><dd>Ab welchem Pegelabfall eine Pause als Phrasenende zählt.</dd>
+    <dt>Min Gap</dt><dd>Wie lang die Pause mindestens sein muss.</dd>
+    <dt>Throw Length</dt><dd>Wie lange der Eingang offen bleibt.</dd>
+    <dt>Between</dt><dd>Wie viel Signal auch zwischen den Würfen durchkommt.</dd>
+  </dl>
+</section>
+
+<section>
+  <h2>Nach der Installation</h2>
+  <ul>
+    <li><strong>In der DAW:</strong> einmal die Plug-ins neu scannen lassen, dann steht
+        „Throw Delay“ unter dem Hersteller <em>beatsexuell</em>.</li>
+    <li><strong>Ohne DAW:</strong> die Standalone-App über das Startmenü öffnen und im Menü
+        <em>Options → Audio Settings</em> Ein- und Ausgang wählen.</li>
+  </ul>
+  <p class="note">Look-ahead heißt Latenz: bei 1 s meldet das Plugin eine Sekunde Verzögerung, die
+     die DAW ausgleicht. Wenn du die Stufe umschaltest, einmal Stop und Play drücken, damit die
+     DAW die neue Latenz übernimmt. Zum Einsingen den Live-Modus nehmen.</p>
+</section>
+
+<section>
+  <h2>Wo was landet</h2>
+  <dl>
+    <dt>VST3</dt><dd><code>C:\Program Files\Common Files\VST3</code></dd>
+    <dt>CLAP</dt><dd><code>C:\Program Files\Common Files\CLAP</code></dd>
+    <dt>LV2</dt><dd><code>C:\Program Files\Common Files\LV2</code></dd>
+    <dt>Standalone</dt><dd><code>C:\Program Files\beatsexuell\Throw Delay</code></dd>
+  </dl>
+</section>
+
+<footer>
+  <p class="mono">AGPLv3 · Lizenztext liegt als LICENSE im Programmordner</p>
+</footer>
+
+</div>
+</body>
+</html>
