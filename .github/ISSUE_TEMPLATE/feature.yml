@@ -1,0 +1,11 @@
+name: Idea
+description: A control or a workflow you would like
+labels: [idea]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: The idea
+      description: What you want to do with Throw Delay, and what is missing for it.
+    validations:
+      required: true

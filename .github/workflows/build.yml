@@ -1,0 +1,105 @@
+# Builds, tests and packages Throw Delay for Windows x64 and macOS (universal: Intel + Apple Silicon).
+# A tag push (or a manual run with a release tag) attaches the zips and the installer to that tag's GitHub release
+# (a draft is created if none exists); other runs only build and test, they store nothing.
+name: build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Attach the files to the release of this tag (e.g. v1.0.0); empty = artifacts only"
+        required: false
+
+permissions:
+  contents: write # release assets
+
+env:
+  PLUGINVAL_VERSION: v1.0.4
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-x64
+            os: windows-2022
+            pluginval_asset: pluginval_Windows.zip
+            pluginval_bin: ./pluginval.exe
+          - name: macos-universal
+            os: macos-14
+            pluginval_asset: pluginval_macOS.zip
+            pluginval_bin: ./pluginval.app/Contents/MacOS/pluginval
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      # JUCE and clap-juce-extensions are submodules, so the checkout has to bring them along.
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Configure
+        run: |
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13
+          else
+            cmake -B build -DCMAKE_BUILD_TYPE=Release
+          fi
+
+      - name: Build
+        run: cmake --build build --config Release --parallel 4
+
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure
+
+      - name: pluginval (strictness 5)
+        run: |
+          curl -sSL -o pluginval.zip "https://github.com/Tracktion/pluginval/releases/download/${PLUGINVAL_VERSION}/${{ matrix.pluginval_asset }}"
+          unzip -q -o pluginval.zip
+          ${{ matrix.pluginval_bin }} --strictness-level 5 --validate-in-process "build/ThrowDelay_artefacts/Release/VST3/Throw Delay.vst3"
+
+      - name: Package
+        run: |
+          VERSION=$(sed -n 's/^#define AppVersion "\(.*\)"/\1/p' installer/ThrowDelay.iss)
+          OUT="ThrowDelay-${VERSION}-${{ matrix.name }}"
+          A=build/ThrowDelay_artefacts/Release
+          mkdir -p "$OUT"
+          cp installer/readme.html "$OUT/Anleitung.html"
+          cp LICENSE "$OUT/"
+          cp -R "$A/VST3/Throw Delay.vst3" "$OUT/"
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            cp -R "$A/AU/Throw Delay.component" "$OUT/"
+            # ad-hoc signature: required for Apple Silicon to load the code at all (not a notarization)
+            for b in "$OUT/Throw Delay.vst3" "$OUT/Throw Delay.component"; do
+              codesign --force --deep --sign - "$b"
+            done
+            lipo -info "$OUT/Throw Delay.vst3/Contents/MacOS/Throw Delay"
+            ditto -c -k --keepParent "$OUT" "$OUT.zip"
+          else
+            cp -R "$A/CLAP/Throw Delay.clap" "$OUT/"
+            cp -R "$A/LV2/Throw Delay.lv2" "$OUT/"
+            cp "$A/Standalone/Throw Delay.exe" "$OUT/"
+            choco install innosetup -y --no-progress > /dev/null
+            "/c/Program Files (x86)/Inno Setup 6/ISCC.exe" installer/ThrowDelay.iss
+            cp build/installer/*.exe .
+            7z a -tzip "$OUT.zip" "$OUT" > /dev/null
+          fi
+          echo "PACKAGE=$OUT" >> "$GITHUB_ENV"
+
+      - name: Attach to release
+        if: github.ref_type == 'tag' || inputs.release_tag != ''
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ inputs.release_tag || github.ref_name }}
+          # a tag push creates a draft; a manual run with release_tag leaves an existing release as it is
+          draft: ${{ inputs.release_tag == '' }}
+          fail_on_unmatched_files: false
+          files: |
+            ${{ env.PACKAGE }}.zip
+            *-Windows.exe

@@ -1,0 +1,42 @@
+name: Bug report
+description: Throws land in the wrong place, it crashes or it does not load
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you sang or played, where the throws landed (mid-phrase, too late, not at all), what you expected.
+    validations:
+      required: true
+  - type: input
+    id: settings
+    attributes:
+      label: Settings
+      placeholder: e.g. Look-ahead 1 s, Sensitivity 18 dB, Min Gap 250 ms, Throw Length 400 ms
+  - type: input
+    id: version
+    attributes:
+      label: Throw Delay version
+      placeholder: e.g. 1.0.0
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: System
+      options: [Windows, macOS (Apple Silicon), macOS (Intel)]
+    validations:
+      required: true
+  - type: input
+    id: host
+    attributes:
+      label: DAW / host, format and sample rate
+      placeholder: e.g. Ableton Live 12, VST3, 48 kHz
+    validations:
+      required: true
+  - type: textarea
+    id: crash
+    attributes:
+      label: Crash only
+      description: What you clicked last. Attach the crash log if your DAW wrote one.
